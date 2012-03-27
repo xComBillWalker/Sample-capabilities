@@ -1,0 +1,26 @@
+# Enable rewrite engine and route requests to appropriate files
+RewriteEngine On
+RewriteBase /pingpong
+RewriteRule ^message/ping$ handle_ping.php [L]
+RewriteRule ^message/pong$ handle_pong.php [L]
+RewriteRule ^publish$ publish_to_fabric.php [L]
+
+# Disable ETags
+<IfModule mod_headers.c>
+	Header Unset ETag
+	FileETag none
+</IfModule>
+
+# Default expires header if none specified (stay in browser cache for 7 days)
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresDefault A604800
+</IfModule>
+
+#optional stuff. rerouting the logfile generation
+# log php errors
+php_flag display_startup_errors off
+php_flag display_errors off
+php_flag html_errors off
+php_flag  log_errors on
+php_value error_log /Library/WebServer/Documents/php-errors.log
