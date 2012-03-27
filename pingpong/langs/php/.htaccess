@@ -3,7 +3,7 @@ RewriteEngine On
 RewriteBase /pingpong
 RewriteRule ^message/ping$ handle_ping.php [L]
 RewriteRule ^message/pong$ handle_pong.php [L]
-RewriteRule ^publish$ publish_to_fabric.php [L]
+RewriteRule ^publish$ send_ping.php [L]
 
 # Disable ETags
 <IfModule mod_headers.c>
