@@ -39,7 +39,7 @@ $write_io = new AvroStringIO();
 $encoder = new AvroIOBinaryEncoder($write_io);
 
 try {
-		// Binary-encode and serialize the supplied CSE message using the CSE schema and the supplied encoder
+		// Binary-encode and serialize the supplied  message using the schema and the supplied encoder
 		// The result is stored in the AvroStringIO object $write_io created above
 		$datum_writer->write($message, $encoder);
 	}
@@ -49,8 +49,7 @@ try {
 	} // end - try block
 	
 	//
-	// Send the CSE message to the Fabric on the topic /cse/offer/create
-	//
+
 	
 try {
 	// Initialize a cURL session
@@ -65,7 +64,7 @@ try {
 	curl_setopt($ch, CURLOPT_POST, true); // TRUE to do a regular HTTP POST. This POST is the normal application/x-www-form-urlencoded kind, most commonly used by HTML forms. 
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: avro/binary", "Authorization: Bearer ZN7UiioumrxSlbS1qdzbu0GH32mJIP/1vZWugLP/eOGonDYqcTz0/+1OyNVdviaC7rwkF9pP","X-XC-DESTINATION-ID: 24+4FfGxHYE+KsK6IVFMU0F7wLUYc+hy3mIGC92zF8eC7raTQ3pa3l6L3IE/PuaV92gz4eZc","X-XC-SCHEMA-VERSION: 1.0.0", "X-XC-SCHEMA-URI: https://api.x.com/ocl/message/ping/1.0.0")); // An array of HTTP header fields to set, in the format array('Content-type: text/plain', 'Content-length: 100')
 	
-	// Add the binary-encoded, serialized CSE message to the HTTP message as the message body
+	// Add the binary-encoded, serialized  message to the HTTP message as the message body
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $write_io->string()); // The full data to post in an HTTP "POST" operation.
 
 	// POST the HTTP request to the Fabric and print the response returned by the Fabric

@@ -9,13 +9,13 @@ include_once 'avro.php';
 $post_data = file_get_contents("php://input");
 $headers = getallheaders();
 
-// Get the URI of the Avro schema on the OCL server that adheres to the /cse/offer/create contract 
+// Get the URI of the Avro schema on the OCL server
 $schema_uri = $headers['X-XC-SCHEMA-URI'];
 
 // Get the contents of the Avro schema identified by the URI retrieved above
 $content = file_get_contents($schema_uri);
 
-// Parse the CSE Avro schema and place results in an AvroSchema object
+// Parse the Avro schema and place results in an AvroSchema object
 $schema = AvroSchema::parse($content);
 
 // Use Avro to decode and deserialize the binary-encoded message body.
@@ -33,7 +33,7 @@ $read_io = new AvroStringIO($post_data);
 // Create an AvroIOBinaryDecoder object and assign it the $read_io object
 $decoder = new AvroIOBinaryDecoder($read_io);
 
-// Decode and deserialize the data using the CSE schema and the supplied decoder
+// Decode and deserialize the data using the schema and the supplied decoder
 // The data is retrieved from the AvroStringIO object $read_io created above
 // Upon return, $message contains the plain text version of the X.commerce message sent by the publisher
 $message = $datum_reader->read($decoder);
@@ -62,7 +62,7 @@ try {
 	curl_setopt($ch, CURLOPT_POST, true); // TRUE to do a regular HTTP POST. This POST is the normal application/x-www-form-urlencoded kind, most commonly used by HTML forms. 
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: avro/binary", "Authorization: Bearer ZN7UiioumrxSlbS1qdzbu0GH32mJIP/1vZWugLP/eOGonDYqcTz0/+1OyNVdviaC7rwkF9pP","X-XC-DESTINATION-ID: ".$publisher_pseudonym,"X-XC-SCHEMA-VERSION: 1.0.0", "X-XC-SCHEMA-URI: https://api.x.com/ocl/message/ping/1.0.0")); // An array of HTTP header fields to set, in the format array('Content-type: text/plain', 'Content-length: 100')
 	
-	// Add the binary-encoded, serialized CSE message to the HTTP message as the message body
+	// Add the binary-encoded, serialized message to the HTTP message as the message body
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data); // The full data to post in an HTTP "POST" operation.
 
 	// POST the HTTP request to the Fabric and print the response returned by the Fabric
