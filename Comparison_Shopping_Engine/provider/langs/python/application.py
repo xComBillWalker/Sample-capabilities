@@ -1,4 +1,4 @@
-#!/home/msmith/py26env/bin/python
+#!/usr/bin/env python
 # encoding: utf-8
 """
 application.py
@@ -19,8 +19,9 @@ from views import index_view
 
 def main():
 	config = Configurator()
-	config.add_route('foo', '/cse/offer/create')
-	config.add_view(index_view, route_name='foo')
+	config.add_static_view('avpr', 'avpr/', cache_max_age=86400)
+	config.add_route('cse', '/cse/offer/create')
+	config.add_view(index_view, route_name='cse')
 	app = config.make_wsgi_app()
 	return app
 

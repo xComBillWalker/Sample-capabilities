@@ -21,11 +21,11 @@ from avro import io, datafile
 def index_view(request):
 	response = request.response
 	if ('POST' != request.method):
-		response.status_int = 405
-		response.status = 'Method Not Allowed'
+		response.status = '405 Method Not Allowed'
 	elif ('avro/binary' != request.content_type):
-		response.status_int = 406
-		response.status = 'Not Acceptable'
+		response.status = '406 Not Acceptable'
+	elif (0 >= request.content_length):
+		response.status = '400 Bad Request'
 	else:
 		rec_reader = io.DatumReader()
 		body_file = request.body_file_seekable
@@ -33,5 +33,5 @@ def index_view(request):
 			body_file,
 			rec_reader,
 		)
-		response.text = 'Still testing'
+		response.text = u'Still testing'
 	return response

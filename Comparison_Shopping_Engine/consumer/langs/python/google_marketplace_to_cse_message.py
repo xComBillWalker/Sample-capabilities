@@ -23,13 +23,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 from StringIO import StringIO
 from avro import schema, io, datafile
-from testdata import TESTDATA, BEARER
+from testdata import BEARER, PUBLISHURL, SERVER, TESTDATA
 from httplib2 import Http
 
 HTTP = Http()
 
-publish_url = 'https://api.sandbox.x.com/fabric/cse/offer/create'
-SCHEMA = schema.parse(open('/home/msmith/dev/Sample-capabilities/Comparison_Shopping_Engine/provider/langs/php/cse.avpr', 'r').read())
+##
+# Get schema from web source
+#
+# @return avro.schema
+def getSchema():
+	resp, content = HTTP.request('%s/avpr/cse.avpr' % SERVER)
+	return schema.parse(content)
 
 ##
 # Write the message data to a StringIO
@@ -38,12 +43,13 @@ SCHEMA = schema.parse(open('/home/msmith/dev/Sample-capabilities/Comparison_Shop
 #
 def write_data():
 	message = TESTDATA
-	datum_writer = io.DatumWriter(SCHEMA)
+	schema = getSchema()
+	datum_writer = io.DatumWriter(schema)
 	data = StringIO()
 	datafile_writer = datafile.DataFileWriter(
 		data,
 		datum_writer,
-		writers_schema=SCHEMA,
+		writers_schema=schema,
 		codec='deflate',
 	)
 	datafile_writer.append(message)
@@ -60,7 +66,7 @@ def main():
 	}
 	body = write_data().getvalue()
 	resp, content = HTTP.request(
-		uri=publish_url,
+		uri=PUBLISHURL,
 		method='POST',
 		body=body,
 		headers=headers,
