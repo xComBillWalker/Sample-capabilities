@@ -1,7 +1,7 @@
 Ruby Example
 ====
 
-I bet we all can write a Fibonacci code in 4 lines. How about, computing a fibonacci series over the Fabric. I feel it is a great example that demonstrates the fundamental principles regarding tenancy, authorization, messaging, etc. Here is the situation - There are two webservers that are registered capabilities. We initiate the computation by pinging an url from one of the clients. After that, the messages autonomously go back and forth between the two capabilities using /message/ping and /message/pong. Each capability deserializes the message, adds the next number in the fibonacci sequence and sends the data back in Avro/binary. This goes on and on..and on.
+I bet we all can write a Fibonacci code in 4 lines. How about, computing a fibonacci series over the Fabric. I feel it is a great example that demonstrates the fundamental principles regarding tenancy, authorization, messaging, etc. Here is the situation - There are two webservers that are registered capabilities. We initiate the computation by pinging a url from one of the clients. After that, the messages autonomously go back and forth between the two capabilities using /message/ping and /message/pong. Each capability deserializes the message, adds the next number in the fibonacci sequence and sends the data back in Avro/binary. This goes on and on..and on.
 
 Register two capabilities with the Fabric. Make sure, you add authorize each capability to send messages to each other. Even, if you are using self token to send messages, there should be a tenancy relationship between listeners and senders.
 
