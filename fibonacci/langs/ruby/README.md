@@ -15,6 +15,7 @@ You need to update the bearer tokens to reflect your credentials. To run this ex
 	sinatra client1.rb
 	
 If you want to modify the code and look at changes immediately during development without having to restart the server every time, install the awesome shotgun gem
+	
 	gem install shotgun
 	shotgun client1.rb -p 9393
 	shotgun client2.rb -p 9494
