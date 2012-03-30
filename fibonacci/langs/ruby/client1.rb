@@ -65,6 +65,7 @@ post '/message/ping' do
     elsif 
       publisher = headers["X_XC_PUBLISHER_PSEUDONYM"]
     end
+    #use self token as the authorization
     response = Fabric.post("/message/pong", \
     {:body => stringwriter.string, :headers => {'Content-Type' => 'avro/binary',  \
       'Authorization' => "Bearer EDgVoX1RU3ji6ms5f5+cbjnjeydbBFQGWWA/rngk3VWCiGjKRLqPX7lUo7wQqbi+karSEroD", \

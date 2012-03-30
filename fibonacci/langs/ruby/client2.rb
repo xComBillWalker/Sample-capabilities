@@ -39,6 +39,7 @@ get '/ping' do
   encoder = Avro::IO::BinaryEncoder.new(stringwriter)
   datumwriter.write(message,encoder)  
   #send to fabric on topic /mesage/ping 
+  #use self token as the authorization, destination is that of client1
   response = Fabric.post("/message/ping", \
   {:body => stringwriter.string, :headers => {'Content-Type' => 'avro/binary',  \
     'Authorization' => "Bearer i815upv6P8X/TVVlS4RP8dzgejA45eQocYwWWcxiG+zsiDu4KsrgZfcLEsH08ncdm/orsvOm", \
@@ -88,6 +89,7 @@ post '/message/pong' do
     elsif 
       publisher = headers["X_XC_PUBLISHER_PSEUDONYM"]
     end
+    #use self token as the authorization
     response = Fabric.post("/message/ping", \
     {:body => stringwriter.string, :headers => {'Content-Type' => 'avro/binary',  \
       'Authorization' => "Bearer i815upv6P8X/TVVlS4RP8dzgejA45eQocYwWWcxiG+zsiDu4KsrgZfcLEsH08ncdm/orsvOm", \
