@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-views.py
+tests.py
 
 Created by Michael Smith on 2012-03-26.
 Copyright (c) 2012 TrueAction. All rights reserved.
@@ -13,29 +13,13 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-
-from __future__ import with_statement
-from avro.datafile import DataFileReader
-from avro.io import DatumReader
-from json import dumps
-from pyramid.view import view_config
+import unittest
 
 ##
-# The sample view at cse/offer/create
+# Sadly, this test still needs the provider server to be running.
 #
-@view_config(name="cse/offer/create")
-def index_view(request):
-	response = request.response
-	if ('POST' != request.method):
-		response.status = '405 Method Not Allowed'
-	elif ('avro/binary' != request.content_type):
-		response.status = '406 Not Acceptable'
-	elif (0 >= request.content_length):
-		response.status = '400 Bad Request'
-	else:
-		rec_reader = DatumReader()
-		body_file = request.body_file_seekable
-		with DataFileReader(body_file, rec_reader) as df_reader:
-			print '\n'.join(dumps(v) for v in df_reader)
-		response.text = u'Still testing'
-	return response
+class CSEPubUnitTest(unittest.TestCase):
+	def test_avro(self):
+		from google_marketplace_to_cse_message import write_data
+		data = write_data()
+		self.assertTrue('"name": "VariationValue"}' in data, data)

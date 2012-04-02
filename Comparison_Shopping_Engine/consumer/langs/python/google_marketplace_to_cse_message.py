@@ -21,8 +21,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 # 3. Process the response data.
 # 4. Get the schema from a URL.
 
+from __future__ import with_statement
+from avro.datafile import DataFileWriter
+from avro.io import DatumWriter
+from avro.schema import parse
 from StringIO import StringIO
-from avro import schema, io, datafile
 from testdata import BEARER, PUBLISHURL, SERVER, TESTDATA
 from httplib2 import Http
 
@@ -34,7 +37,7 @@ HTTP = Http()
 # @return avro.schema
 def getSchema():
 	resp, content = HTTP.request('%s/avpr/cse.avpr' % SERVER)
-	return schema.parse(content)
+	return parse(content)
 
 ##
 # Write the message data to a StringIO
@@ -44,16 +47,12 @@ def getSchema():
 def write_data():
 	message = TESTDATA
 	schema = getSchema()
-	datum_writer = io.DatumWriter(schema)
+	datum_writer = DatumWriter(schema)
 	data = StringIO()
-	datafile_writer = datafile.DataFileWriter(
-		data,
-		datum_writer,
-		writers_schema=schema,
-		codec='deflate',
-	)
-	datafile_writer.append(message)
-	return data
+	with DataFileWriter(data, datum_writer, writers_schema=schema, codec='deflate') as datafile_writer:
+		datafile_writer.append(message)
+		datafile_writer.sync()
+		return data.getvalue()
 
 ##
 # Make the POST to x.com and dump its response
@@ -64,7 +63,7 @@ def main():
 		"Authorization": "Bearer %s" % BEARER,
 		"X-XC-SCHEMA-VERSION": "1.0.0",
 	}
-	body = write_data().getvalue()
+	body = write_data()
 	resp, content = HTTP.request(
 		uri=PUBLISHURL,
 		method='POST',
