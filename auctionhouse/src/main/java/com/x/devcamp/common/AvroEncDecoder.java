@@ -49,7 +49,7 @@ public class AvroEncDecoder {
     public static <T extends IndexedRecord> T decode(byte[] data, Schema schema) throws IOException {
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         SpecificDatumReader<T> reader = new SpecificDatumReader<T>(schema);
-        Decoder decoder = DecoderFactory.get().jsonDecoder(schema, bais);
+        Decoder decoder = DecoderFactory.get().binaryDecoder(bais, null);
         T result = reader.read(null, decoder);
         bais.close();
         return result;

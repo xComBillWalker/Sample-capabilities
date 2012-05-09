@@ -115,7 +115,7 @@ public class AuctionHouse extends Server {
         XFabricPublisher publisher = new XFabricPublisher(xFabricUrl, props.getProperty("token.main"), tenants);
         Auctioneer auctioneer = new Auctioneer(publisher);
 
-        server.addServlet("/bid/placed", new BidProcessor(auctioneer, publisher, props.getProperty("token.xfabric")));
+        server.addServlet("/experimental/bid/placed", new BidProcessor(auctioneer, publisher, props.getProperty("token.xfabric")));
         server.addServlet("/message/failed", new MessageLogger());
 
         // Loading product info
@@ -138,7 +138,7 @@ public class AuctionHouse extends Server {
 
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            System.out.println("Topic: " + req.getRequestURI());
+            System.out.println("Message receifed on Topic: " + req.getRequestURI());
 
             byte[] data = getMessageBody(req);
             GenericDatumReader<GenericRecord> reader = new GenericDatumReader<GenericRecord>();

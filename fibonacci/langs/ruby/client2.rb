@@ -55,8 +55,8 @@ post '/message/pong' do
   puts "\nPong received on /message/pong\n-----\n"
   message_body = request.env["rack.input"].read
   headers = request_headers
-  #puts "headers\n--------\n"
-  #puts headers
+  puts "headers\n--------\n"
+  puts headers
   #verify that this is from fabric
   if fabric_token == request_headers["AUTHORIZATION"]
     #similar to above, send to pong

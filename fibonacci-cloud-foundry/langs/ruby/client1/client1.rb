@@ -5,7 +5,8 @@ Bundler.require
 
 class Fabric
   include HTTParty
-  base_uri 'https://api.sandbox.x.com/fabric' 
+  #base_uri 'https://api.sandbox.x.com/fabric' 
+  base_uri 'https://api.sandbox.x.com:444/fabric' 
 end
 
 helpers do
@@ -14,7 +15,7 @@ helpers do
   end
   
   def fabric_token
-    "Bearer 1362247a-0813-4f04-8503-10f324b1fb8b"
+    "Bearer d67OZUVRi1PwMw6CfPhnB7jVPgcZPJF8BY1uCsrp6GvK8266xPEcHjSl9rKVtCWB0Oe4OIr3"
   end
 end
 
@@ -24,13 +25,14 @@ end
 
 
 
-post '/experimental/message/ping' do
-  _authorization = "Bearer 7d638a10-977f-435d-b3d1-2403cd300219"
+post '/message/ping' do
+  _authorization = "Bearer gIvYcyvlRnZlZeESGN5w/XL29kz7X7jaONmRcaZu0f9NBGo7hiHgspTxHUzGrcwdpQehV5w7"
   puts "\nPing received on /message/ping\n-----\n"
   message_body = request.env["rack.input"].read
   headers = request_headers
  
   #verify that this is from fabric
+  
   if fabric_token == request_headers["AUTHORIZATION"]
     
     #similar to above, send to pong
@@ -66,7 +68,7 @@ post '/experimental/message/ping' do
         publisher = headers["X_XC_PUBLISHER_PSEUDONYM"]
       end
       #use self token as the authorization
-      response = Fabric.post("/experimental/message/pong", \
+      response = Fabric.post("/message/pong", \
       {:body => stringwriter.string, :headers => {'Content-Type' => 'avro/binary',  \
         'Authorization' => "#{_authorization}", \
         'X-XC-DESTINATION-ID' => publisher,\

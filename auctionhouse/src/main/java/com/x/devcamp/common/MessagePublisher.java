@@ -26,4 +26,6 @@ public interface MessagePublisher {
     String publishMessage(String topic, String tenantId, byte[] data) throws MessagePublishException;
 
     String publishMessage(String topic, String tenantId, String continuationGuid, byte[] data) throws MessagePublishException;
+    
+    public String publishMessage(String topic, String tenant, String continuationGuid, byte[] data, String destinationId) throws MessagePublishException;
 }

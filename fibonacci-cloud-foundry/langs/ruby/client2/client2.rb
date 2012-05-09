@@ -6,7 +6,7 @@ Bundler.require
 
 class Fabric
   include HTTParty
-  base_uri 'https://api.sandbox.x.com/fabric' 
+  base_uri 'https://api.sandbox.x.com:444/fabric' 
 end
 
 helpers do
@@ -15,7 +15,7 @@ helpers do
   end
   
   def fabric_token
-    "Bearer 39477dc4-4bfa-4a44-be77-8e649d513ac6"
+    "Bearer r9sOhMSSMMbdeWFf5fzJSQZwi8uLKwYuX980C4mhb7RWNyE4DG5kfLEBSDEldx816PMj2eqE"
     
   end
 end
@@ -26,8 +26,8 @@ end
 
 get '/ping' do
   
- destination_id = '4ccc670c-cc90-4cdb-804c-a12c7a11e2ed'
- authorization = 'Bearer 7c4cf104-911c-4a9c-b61b-9442ed3aac37'
+ destination_id = '1hY9DuEYLolAeCodxGvaxc+8I2NtqUWEPG14Uc4JFzveKav4mwua2IXH2YzyXWf4DLanA4r8'
+ authorization = 'Bearer A5m8SBG9+HE8tuFxzN1ndSo7yzmILjPty/q5v/Wxpro7BhYHxi2qD16suYPAIzk+D6kPeHMa'
  
   #get schema for ping
   file = HTTParty.get("https://api.x.com/ocl/message/ping/1.0.0")
@@ -42,7 +42,7 @@ get '/ping' do
   datumwriter.write(message,encoder)  
   #send to fabric on topic /mesage/ping 
   #use self token as the authorization, destination is that of client1
-  response = Fabric.post("/experimental/message/ping", \
+  response = Fabric.post("/message/ping", \
   {:body => stringwriter.string, :headers => {'Content-Type' => 'avro/binary',  \
     'Authorization' => "#{authorization}", \
     'X-XC-DESTINATION-ID' => "#{destination_id}",\
@@ -54,9 +54,9 @@ get '/ping' do
 end
 
 
-post '/experimental/message/pong' do
+post '/message/pong' do
   puts "\nPong received on /message/pong\n-----\n"
-  _authorization = 'Bearer 7c4cf104-911c-4a9c-b61b-9442ed3aac37'
+  _authorization = 'Bearer A5m8SBG9+HE8tuFxzN1ndSo7yzmILjPty/q5v/Wxpro7BhYHxi2qD16suYPAIzk+D6kPeHMa'
   message_body = request.env["rack.input"].read
   headers = request_headers
   
@@ -93,7 +93,7 @@ post '/experimental/message/pong' do
       publisher = headers["X_XC_PUBLISHER_PSEUDONYM"]
     end
     #use self token as the authorization
-    response = Fabric.post("/experimental/message/ping", \
+    response = Fabric.post("/message/ping", \
     {:body => stringwriter.string, :headers => {'Content-Type' => 'avro/binary',  \
       'Authorization' => "#{_authorization}", \
       'X-XC-DESTINATION-ID' => publisher,\

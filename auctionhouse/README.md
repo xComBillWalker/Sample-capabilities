@@ -5,15 +5,15 @@ AuctionHouse
 This example has been modified from the Innovate 2011 workshop. The bidder class was updated to demonstrate passing Avro schemas by reference, as required by the new versions of the XFabric. To run this example using the X.commerce sandbox, please make sure that this application is hosted on a publicly accessible host.
 
 1. Create the following topics:
-/auction/ended 
-/auction/started 
-/auction/updated 
-/bid/accepted 
-/bid/extended 
-/bid/outbid 
-/bid/placed 
-/bid/rejected 
-/bid/won 
+/experimental/auction/ended 
+/experimental/auction/started 
+/experimental/auction/updated 
+/experimental/bid/accepted 
+/experimental/bid/extended 
+/experimental/bid/outbid 
+/experimental/bid/placed 
+/experimental/bid/rejected 
+/experimental/bid/won 
 2. Define a capability and register the endpoint URL to a public instance of where the auctionhouse demo is running.
 3. Subscribe capability to topics (bid/placed)
 4. Register tenants with the capability

@@ -31,8 +31,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicHeader;
 
 public class XFabricPublisher implements MessagePublisher {
@@ -49,22 +52,33 @@ public class XFabricPublisher implements MessagePublisher {
         this.url = url;
         this.capabilityToken = capToken;
         this.tenantTokens = tenantTokens;
-        this.client = new DefaultHttpClient();
+		SchemeRegistry registry = TrustAllClients.getSchemeRegistry();
+		ClientConnectionManager connectionMgr = new ThreadSafeClientConnManager(
+		        registry );
+		this.client = new DefaultHttpClient( connectionMgr );
     }
 
     public String publishMessage(String topic, String tenant, byte[] data) throws MessagePublishException {
-        return publishMessage(topic, tenant, null, data);
+        return publishMessage(topic, tenant, null, data, null);
+    }
+    
+    public String publishMessage(String topic, String tenant, String continuationGuid, byte[] data) throws MessagePublishException {
+    	return publishMessage(topic, tenant, continuationGuid, data, null);
     }
 
-    public String publishMessage(String topic, String tenant, String continuationGuid, byte[] data) throws MessagePublishException {
+    public String publishMessage(String topic, String tenant, String continuationGuid, byte[] data, String destinationId) throws MessagePublishException {
         final HttpPost method = new HttpPost(this.url + topic);
         final String authToken = tenant == null ? this.capabilityToken : tenantTokens.get(tenant);
         method.addHeader(new BasicHeader(HttpHeaders.AUTHORIZATION, (authToken == null ? tenant : authToken)));
         method.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "avro/binary"));
         method.addHeader(new BasicHeader("X-XC-SCHEMA-VERSION", "1.0"));
+        //This is only available in sandbox.
         method.addHeader(new BasicHeader("X-XC-SCHEMA-URI", "http://localhost/1.0" + topic));
         if (continuationGuid != null) {
             method.addHeader(new BasicHeader("X-XC-MESSAGE-GUID-CONTINUATION", continuationGuid));
+        }
+        if(destinationId != null){
+        	method.addHeader(new BasicHeader("X-XC-DESTINATION-ID", destinationId));
         }
         method.setEntity(new ByteArrayEntity(data));
         try {
@@ -75,7 +89,7 @@ public class XFabricPublisher implements MessagePublisher {
             response.getEntity().getContent().close(); // needed to be able to
                                                        // reuse the connection
             String guid = response.getHeaders("X-XC-MESSAGE-GUID")[0].getValue();
-            System.out.println("Message: " + guid);
+            System.out.println("Message: " + guid + " published on Topic:  " + topic );
             return guid;
         } catch (ClientProtocolException e) {
             throw new MessagePublishException(e);
