@@ -30,7 +30,7 @@ $xFabricAuth = "Bearer y/64jZMGK2zpv+MQ9VDO6qrpSyXz6M7uRRL3n5yhJe3gOIBLAelEFceSh
 // Your capability's SELF-Destination ID on the XFabric
 // Set to the Destination ID given to your capability by the XFabric
 // In other cases you would set this to the destination ID of the capability you wish to talk to
-// (The XFabic responds to pings directly if you want to ping it)
+// (The XManager responds to pings directly if you want to ping it)
 $destID = "l2RL2Xc4sOHsUCz23LPagSEFug6SOab87O36V/iBcp2qMHzLatLdcinxj3ZGUO0CONM8oRzl";
 
 // The SELF-Authentication Token of your capability
