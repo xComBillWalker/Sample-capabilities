@@ -7,7 +7,7 @@
 //
 
 include_once 'avro.php';
-include 'common.php';
+include_once 'common.php';
 
 // Get the message body out of the HTTP request message. The message body is currently in Avro binary form
 $post_data = file_get_contents("php://input");
@@ -22,7 +22,7 @@ $fp = fopen('ping_pong.log', 'at');
 if ($headers['Authorization'] != FABRIC_CRED_PONGER) {
 	fwrite($fp, "\n\nFATAL ERROR: Authorization header does not contain correct Fabric credentials.\n\n");
 	fclose($fp);
-	die(); // terminate this script
+	die(); // Terminate this script. In a more complete capability, return 403 to the Fabric
 }
 
 // Get the full request URI
