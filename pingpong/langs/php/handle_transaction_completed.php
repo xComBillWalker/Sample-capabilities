@@ -1,7 +1,7 @@
 <?php
 
 //
-// This module is part of the Ponger capability.
+// This module is part of the Pinger capability.
 // -- It handles the TransactionCompleted message. 
 // -- This message ends the PingCapability transaction of the PingPong workflow.
 //
@@ -15,7 +15,7 @@ $headers = getallheaders();
 $fp = fopen('ping_pong.log', 'at');
 
 // Verify the message came from the Fabric
-if ($headers['Authorization'] != FABRIC_CRED_PONGER) {
+if ($headers['Authorization'] != FABRIC_CRED_PINGER) {
 	fwrite($fp, "\n\nFATAL ERROR: Authorization header does not contain correct Fabric credentials.\n\n");
 	fclose($fp);
 	die(); // Terminate this script. In a more complete capability, return 403 to the Fabric
@@ -31,12 +31,13 @@ if ( !($topic = strstr($request_uri, "/com.x.core.v1/TransactionCompleted"))) {
 	die(); // Terminate the script. In a more complete capability, return 404 to the Fabric
 }    
 
-fwrite($fp, "\n\n(4) handle_transaction_completed.php:\nReceived a TransactionCompleted message on topic " . $topic);
+fwrite($fp, "\n\n(5) Pinger, handle_transaction_completed.php:\nReceived a message on topic " . $topic);
 
 fwrite($fp,"\n\nTransactionCompleted Message Headers\n------------------------------------\n");
 fwrite($fp, print_r($headers, true));
 
 fwrite($fp, LOG_SEPARATOR_STRING);
+fwrite($fp, "\n\nEnd PingCapability Transaction\nEnd PingPong Workflow");
 fwrite($fp, LOG_SEPARATOR_STRING);
 
 fclose($fp)

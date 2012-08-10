@@ -15,4 +15,5 @@ const LOG_SEPARATOR_STRING           = "\n\n***********************************\
 const SCHEMA_VER_PING                = "1.0.6";
 const SCHEMA_VER_PONG                = "1.0.6";
 const SCHEMA_VER_TRANS_COMPLETED     = "1.0.1";
+
 ?>

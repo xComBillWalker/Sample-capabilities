@@ -3,13 +3,14 @@
 //
 // This module is part of the Ponger capability. The module: 
 // -- handles the Ping message of the PingCapability transaction of the PingPong workflow
-// -- sends the Pong message of the PingCapability transaction of the PingPong workflow in response
+// -- in response to the Ping message, sends the Pong message of the PingCapability transaction 
+//    of the PingPong workflow to the Pinger capability
 //
 
 include_once 'avro.php';
 include_once 'common.php';
 
-// Get the message body out of the HTTP request message. The message body is currently in Avro binary form
+// Get the message body out of the HTTP request message. The message body is currently in Avro binary format
 $post_data = file_get_contents("php://input");
 
 // Get the headers out of the HTTP request message
@@ -35,7 +36,7 @@ if ( !($topic = strstr($request_uri, "/com.x.ecosystemmanagement.v1/PingPong/Pin
 	die();
 }    
 
-fwrite($fp, "\n\n(2) handle_ping.php:\n(a) Received a Ping message on topic " . $topic);
+fwrite($fp, "\n\n(2) Ponger, handle_ping.php:\n(a) Received a message on topic " . $topic);
 
 fwrite($fp,"\n\nPing Message Headers \n--------------------\n");
 fwrite($fp, print_r($headers, true));
@@ -87,6 +88,50 @@ catch (Exception $e) {
 	echo "\n\nError sending HTTP POST request to the Fabric!";
 	echo "\n\nException object:" . $e;
 }
+
+// Now, send the TransactionCompleted message to complete the PingCapability transaction of the PingPong workflow
+// Note that, because the TransactionCompleted message has no body, there is no need to use Avro to serialize anything.
+//
+// NOTE: The PingCapability transaction of the PingPong workflow is a response type transaction
+//       According to the rules for this transaction type, the capability that plays the *receiver* role 
+//       must send the TransactionCompleted. That's why Ponger sends this message.
+
+// Wait for 1 second to give Pinger time to handle the Pong message sent above
+usleep(1000000);
+try {
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, FABRIC_URL . "/com.x.core.v1/TransactionCompleted");
+
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // !!! Take this statement out before posting this code to the SampleCapability repo on github !!!
+
+	curl_setopt($ch, CURLOPT_HEADER, true);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_HTTPHEADER,
+			array("Content-Type: avro/binary"
+				 ,"Authorization: "       . TENANT_CRED_PONGER_TEST_TENANT
+				 ,"X-XC-MESSAGE-GUID-CONTINUATION: " . $headers['X-XC-MESSAGE-GUID']
+				 ,"X-XC-WORKFLOW-ID: "    . $headers['X-XC-WORKFLOW-ID']
+				 ,"X-XC-TRANSACTION-ID: " . $headers['X-XC-TRANSACTION-ID']
+				 ,"X-XC-DESTINATION-ID: " . $publisher_pseudonym
+				 ,"X-XC-SCHEMA-VERSION: " . SCHEMA_VER_TRANS_COMPLETED));
+
+	fwrite($fp, "\n\n(4) Ponger, handle_ping.php:\nSending a TransactionCompleted message on topic /com.x.core.v1/TransactionCompleted");
+	
+	// Send the HTTP request
+	$response = curl_exec($ch);
+
+	fwrite($fp, "\n\nHTTP response from the Fabric to the TransactionCompleted message:");
+	fwrite($fp, "\n" . $response);
+	fwrite($fp, LOG_SEPARATOR_STRING);
+	fflush($fp);
+}
+catch (Exception $e) {
+	echo "\n\nError sending HTTP POST request to the Fabric!";
+	echo "\n\nException object:" . $e;
+}
+
  
 fclose($fp);
 ?>
