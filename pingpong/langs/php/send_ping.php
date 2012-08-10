@@ -26,14 +26,11 @@
 //
 
 include_once 'avro.php';
-include_once 'xcom_guid.php';
+include_once 'guid_gen.php';
 include_once 'common.php';
 
-$wf_pingpong_guid  = guid(); // Generate a GUID and use it to uniquely identify the PingPong workflow
-$txn_ping_cap_guid = guid(); // Generate a GUID and use it to uniquely identify the PingCapability transaction
-
-// Get the Avro message schema from the XOCL server for the message associated with the supplied topic 
-$content = file_get_contents("https://api.x.com/ocl/com.x.ecosystemmanagement.v1/PingPong/Ping/" . SCHEMA_VER_PING);
+// Get the Avro message schema from the XOCL server for the message associated with the Ping topic 
+$json_schema = file_get_contents("https://api.x.com/ocl/com.x.ecosystemmanagement.v1/PingPong/Ping/" . SCHEMA_VER_PING);
 
 // Initialize the Ping message
 $message = array(
@@ -41,8 +38,8 @@ $message = array(
 );
 
 // Serialize the Ping message into Avro binary format
-$schema = AvroSchema::parse($content);
-$datum_writer = new AvroIODatumWriter($schema);
+$avro_schema  = AvroSchema::parse($json_schema);
+$datum_writer = new AvroIODatumWriter($avro_schema);
 $write_io     = new AvroStringIO();
 $encoder      = new AvroIOBinaryEncoder($write_io);
 
@@ -75,8 +72,8 @@ try {
 	$headers = array("Content-Type: avro/binary"
 			         ,"Authorization: "       . TENANT_CRED_PINGER_TEST_TENANT
 	    	   		 ,"X-XC-MESSAGE-GUID-CONTINUATION: "
-	    	   		 ,"X-XC-WORKFLOW-ID: "    . $wf_pingpong_guid
-	    	   		 ,"X-XC-TRANSACTION-ID: " . $txn_ping_cap_guid
+	    	   		 ,"X-XC-WORKFLOW-ID: "    . guid()
+	    	   		 ,"X-XC-TRANSACTION-ID: " . guid()
 			   		 ,"X-XC-DESTINATION-ID: " . CAPABILITY_ID_PONGER
 			   		 ,"X-XC-SCHEMA-VERSION: " . SCHEMA_VER_PING);
 	

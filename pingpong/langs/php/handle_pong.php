@@ -21,7 +21,7 @@ $fp = fopen('ping_pong.log', 'at');
 if ($headers['Authorization'] != FABRIC_CRED_PINGER) {
 	fwrite($fp, "\n\nFATAL ERROR: Authorization header does not contain correct Fabric credentials.\n\n");
 	fclose($fp);
-	die(); // terminate the script
+	die(); // Terminate this script. In a more complete capability, return 403 to the Fabric
 }
 
 // Get the URI of the Avro schema from the OCL server. This URI is in the request header X-XC-SCHEMA-URI
@@ -42,7 +42,7 @@ $request_uri = $_SERVER['REQUEST_URI'];
 if ( !($topic = strstr($request_uri, "/com.x.ecosystemmanagement.v1/PingPong/Pong"))) {
 	fwrite($fp, "\n\nUnexpected topic: " . $request_uri . "\n\n");
 	fclose($fp);
-	die();
+	die(); // Terminate the script. In a more complete capability, return 404 to the Fabric
 }    
 
 fwrite($fp, "\n\n(3) handle_pong.php:\n(a) Received a Pong message on topic " . $topic);

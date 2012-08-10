@@ -18,7 +18,7 @@ $fp = fopen('ping_pong.log', 'at');
 if ($headers['Authorization'] != FABRIC_CRED_PONGER) {
 	fwrite($fp, "\n\nFATAL ERROR: Authorization header does not contain correct Fabric credentials.\n\n");
 	fclose($fp);
-	die(); // terminate the script
+	die(); // Terminate this script. In a more complete capability, return 403 to the Fabric
 }
 
 // Get the full request URI
@@ -28,7 +28,7 @@ $request_uri = $_SERVER['REQUEST_URI'];
 if ( !($topic = strstr($request_uri, "/com.x.core.v1/TransactionCompleted"))) {
 	fwrite($fp, "Unexpected topic: " . $request_uri . "\n\n");
 	fclose($fp);
-	die();
+	die(); // Terminate the script. In a more complete capability, return 404 to the Fabric
 }    
 
 fwrite($fp, "\n\n(4) handle_transaction_completed.php:\nReceived a TransactionCompleted message on topic " . $topic);
