@@ -1,3 +1,5 @@
+#This example does not use XOCL. This exists as an example to demonstrate a simple use case showed during Innovate 2011.
+
 # Demo
 
 # Setup
