@@ -10,19 +10,21 @@
 //
 // This transaction is a response type transaction in which:
 // -- 1. The Pinger capability sends a Ping message to a capability playing the Ponger role.
-// -- 2. Upon receipt of the Ping message, the Ponger capability responds by sending a Pong message
-//       back to the Pinger capability.
-// -- 3. Upon receipt of the Pong message, the Pinger capability sends the Ponger capability
-//       a TransactionCompleted message, thereby ending the transaction.
+// -- 2. Upon receipt of the Ping message, the Ponger capability: 
+//       -- responds by sending a Pong message to the Pinger capability
+//       -- sends a TransactionCompleted message to the Pinger capability, thereby ending the transaction.
+// -- 3. Upon receipt of the Pong message, the Pinger capability writes the message headers to the log file
+// -- 4. Upon receipt of the TransactionCompleted message, the Pinger capability writes the 
+//       message headers to the log file.
 //
 // NOTE: The PingPong demo does *not* show you everything required to implement a complete, 
 //       choreographed capability. Instead, the demo covers the basics. To learn more, 
-//       please read the documents on http://www.x.com.
+//       please read the documentation on http://www.x.com.
 // 
 
 //
 // This module is part of the Pinger capability. The module kicks off the PingPong workflow 
-// by sending the Ping message of the PingCapability transaction of the PingPong workflow to the Ponger capability.
+// by sending the Ping message of the PingCapability transaction to the Ponger capability.
 //
 
 include_once 'avro.php';
@@ -55,7 +57,7 @@ catch (Exception $e) {
 $fp = fopen('ping_pong.log', 'at');
 fwrite($fp, "\n\nXOCL Workflow:    com.x.ecosystemmanagement.v1.PingPong");
 fwrite($fp, "\nXOCL Transaction: com.x.ecosystemmanagement.v1.PingCapability");
-fwrite($fp, "\n\n(1) send_ping.php:\nSending a Ping message on topic /com.x.ecosystemmanagement.v1/PingPong/Ping");
+fwrite($fp, "\n\n(1) Pinger, send_ping.php:\nSending a Ping message on topic /com.x.ecosystemmanagement.v1/PingPong/Ping");
 
 // Send the Ping message of PingCapability transaction of the PingPong workflow
 try {
