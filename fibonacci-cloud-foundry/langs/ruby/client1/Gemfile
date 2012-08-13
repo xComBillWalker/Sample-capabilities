@@ -1,6 +1,0 @@
-source "http://rubygems.org"
-
-gem "sinatra"
-gem "httparty"
-#gem "avro", :git => 'https://github.com/xcommerce/avro-ruby.git'
-gem 'avro'
