@@ -3,11 +3,25 @@ require 'sinatra'
 require 'httparty'
 require 'avro'
 require 'pp'
+require 'ostruct'
+#require 'uuidtools'
+require 'uuid'
+
 
 
 class Fabric
   include HTTParty
-  base_uri 'https://localhost:8080' 
+  base_uri 'https://api.sandbox.x.com/fabric'
+end
+
+class Message
+  def pingpong
+    {"schema_uri_ping" => 'https://api.x.com/ocl/com.x.ecosystemmanagement.v1/PingPong/Ping/1.0.6',
+    "schema_uri_pong" => 'https://api.x.com/ocl/com.x.ecosystemmanagement.v1/PingPong/Pong/1.0.6',
+    "schema_ver_ping" => '1.0.6',
+    "schema_ver_pong" => '1.0.6',
+    "schema_ver_trans_completed" => '1.0.1'}
+  end
 end
 
 helpers do
@@ -16,8 +30,18 @@ helpers do
   end
   
   def fabric_token
+    #fib1-x capability
     #change this to your capability specific fabric bearer token
-    "Bearer 1kFKrtMpvm1KPdetDV/9PvQxTgzJXtkxYgGuodJir5yajHwegtCbJOoY+zvKDDh8oLxIiA0X"  #fabric bearer token
+    "Bearer lq7P9IkRzn6MfXdJ20VcI6NhppyPb6+bcKxvMiIFXZNzfBDn7ufYoXi5BWaMqe9y+5GoNQ5g"  #fabric bearer token
+  end
+  
+  def my_authorization
+    #SV test merchant
+    "Bearer bOQPCZn0Z7WDQ0JwgcEd1lH+DQbrHh8x1dBmEcw7X2rGqIgPOZGGP96hb0GLqZFHTP1XX5z/"
+  end
+  
+  def my_destination_id
+    "g8T4114vhIYNqlxu3jA+geDoRh0/RzEJI6kM1Y4hEU6EcCUrs5nM4raSxiWRYiHheTpnDPhI"
   end
 end
 
@@ -27,8 +51,9 @@ end
 
 get '/ping' do
   
+  ping = OpenStruct.new Message.new.pingpong
   #get schema for ping
-  file = HTTParty.get("https://api.x.com/ocl/message/ping/1.0.0")
+  file = HTTParty.get(ping.schema_uri_ping)
   #ruby hackery before parsing the schema. ensures that avro lib cleanly parses this schema
   schema = Avro::Schema.parse(file.parsed_response.to_s.gsub(/\=\>/,':').gsub(/nil/,"\"null\""))
   #test message
@@ -38,19 +63,24 @@ get '/ping' do
   datumwriter = Avro::IO::DatumWriter.new(schema)
   encoder = Avro::IO::BinaryEncoder.new(stringwriter)
   datumwriter.write(message,encoder)  
+  
   #send to fabric on topic /mesage/ping 
-  response = Fabric.post("/message/ping", \
+  response = Fabric.post("/com.x.ecosystemmanagement.v1/PingPong/Ping", \
   {:body => stringwriter.string, :headers => {'Content-Type' => 'avro/binary',  \
-    'Authorization' => "Bearer jS2t0mxpNWtXsoMQtcoyw2NtyDZDz+aHjuIb+z1PtEiqmPXkzEoWJH4NnBuL5MHWXI1WHyWc", \
-    'X-XC-DESTINATION-ID' => '24+4FfGxHYE+KsK6IVFMU0F7wLUYc+hy3mIGC92zF8eC7raTQ3pa3l6L3IE/PuaV92gz4eZc',\
-    'X-XC-SCHEMA-VERSION' => "1.0.0"}})
+    'Authorization' => my_authorization, \
+    'X-XC-DESTINATION-ID' => my_destination_id,\
+    'X-XC-MESSAGE-GUID-CONTINUATION' => '',\
+    'X-XC-WORKFLOW-ID' => UUID.new.generate,\
+    'X-XC-TRANSACTION-ID' => UUID.new.generate,\
+    'X-XC-SCHEMA-VERSION' => ping.schema_ver_ping}})
     
   "#{response.code}, #{response.headers.inspect}"
   
 end
 
-post '/message/ping' do
-  puts "\nPing received on /message/ping\n-----\n"
+post '/com.x.ecosystemmanagement.v1/PingPong/Ping' do
+  puts "\nPing received on /com.x.ecosystemmanagement.v1/PingPong/Ping/\n-----\n"
+  pong = OpenStruct.new Message.new.pingpong
   message_body = request.env["rack.input"].read
   headers = request_headers
   puts "headers\n--------\n"
@@ -62,23 +92,31 @@ post '/message/ping' do
     #in other cases we can get the schema from X_XC_SCHEMA_URI header and do some processing
     # and send something back. the intent here is just to pong back!
     
-    #publisher is X_XC_PUBLISHER_PSEUDONYM (new version 11.1) or X_XC_PUBLISHER (old version)
-    if headers.has_key?("X_XC_PUBLISHER")
-      publisher = headers["X_XC_PUBLISHER"]
-    elsif 
-      publisher = headers["X_XC_PUBLISHER_PSEUDONYM"]
-    end
-    response = Fabric.post("/message/pong", \
+    #publisher is X_XC_PUBLISHER_PSEUDONYM 
+    publisher = headers["X_XC_PUBLISHER_PSEUDONYM"]
+    puts "publisher #{publisher}"
+    response = Fabric.post("/com.x.ecosystemmanagement.v1/PingPong/Pong", \
     {:body => message_body, :headers => {'Content-Type' => 'avro/binary',  \
-      'Authorization' => "Bearer jS2t0mxpNWtXsoMQtcoyw2NtyDZDz+aHjuIb+z1PtEiqmPXkzEoWJH4NnBuL5MHWXI1WHyWc", \
+      'Authorization' => my_authorization, \
       'X-XC-DESTINATION-ID' => publisher,\
-      'X-XC-SCHEMA-VERSION' => "1.0.0"}})
-    
+      'X-XC-MESSAGE-GUID-CONTINUATION' => headers["X_XC_MESSAGE_GUID"],\
+      'X-XC-TRANSACTION-ID' => headers['X_XC_TRANSACTION_ID'],\
+      'X-XC-WORKFLOW-ID'=> headers['X_XC_WORKFLOW_ID'],\
+      'X-XC-SCHEMA-VERSION' => pong.schema_ver_pong}})
+  else
+    #auth failed. terminate.
+    puts "FATAL: Authorization failure."
+    #exit
   end
 end
 
-post '/message/pong' do
-  puts "\nPing received on /message/pong\n-----\n"
+post '/com.x.core.v1/TransactionCompleted' do
+  puts "Received transaction completed message on /com.x.core.v1/TransactionCompleted"
+end
+
+post '/com.x.ecosystemmanagement.v1/PingPong/Pong' do
+  pong = OpenStruct.new Message.new.pingpong
+  puts "\nPing received on /com.x.ecosystemmanagement.v1/PingPong/Pong/\n-----\n"
   message_body = request.env["rack.input"].read
   headers = request_headers
   puts "headers\n--------\n"
@@ -97,5 +135,18 @@ post '/message/pong' do
     read_value = datumreader.read(decoder)
     puts "\nmessage\n-------\n"
     puts read_value
+    puts "\n replying with a transaction completed mesage on /com.x.core.v1/TransactionCompleted"
+    publisher = headers["X_XC_PUBLISHER_PSEUDONYM"]
+    response = Fabric.post("/com.x.core.v1/TransactionCompleted", \
+    {:body => message_body, :headers => {'Content-Type' => 'avro/binary',  \
+      'Authorization' => my_authorization, \
+      'X-XC-DESTINATION-ID' => publisher,\
+      'X-XC-MESSAGE-GUID-CONTINUATION' => headers["X_XC_MESSAGE_GUID"],\
+      'X-XC-TRANSACTION-ID' => headers['X_XC_TRANSACTION_ID'],\
+      'X-XC-WORKFLOW-ID'=> headers['X_XC_WORKFLOW_ID'],\
+      'X-XC-SCHEMA-VERSION' => pong.schema_ver_trans_completed}})
+  else
+    puts "FATAL: Authorization failure."
+    #exit
   end
 end
