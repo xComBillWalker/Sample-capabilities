@@ -1,9 +1,12 @@
 # Enable rewrite engine and route requests to appropriate files
 RewriteEngine On
+
+ # !!! change this to /your_doc_root/pingpong
 RewriteBase /web/pingpong
-RewriteRule ^com.x.ecosystemmanagement.v1/PingPong/Ping$ handle_ping.php [L]
-RewriteRule ^com.x.ecosystemmanagement.v1/PingPong/Pong$ handle_pong.php [L]
-RewriteRule ^com.x.core.v1/TransactionCompleted$ handle_transaction_completed.php [L]
+
+RewriteRule ^com.x.ecosystemmanagement.v2/PingPong/Ping$ handle_ping.php [L]
+RewriteRule ^com.x.ecosystemmanagement.v2/PingPong/Pong$ handle_pong.php [L]
+RewriteRule ^message/failed$ handle_message_failed.php [L]
 RewriteRule ^publish$ send_ping.php [L]
 
 # Disable ETags
