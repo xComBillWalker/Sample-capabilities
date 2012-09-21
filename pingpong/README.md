@@ -1,8 +1,15 @@
-Ping Pong Example
+PingPong Demo
 =============
 
-This example demonstrates a basic messaging mechanism using the Fabric. A capability posts to /message/ping on the Fabric. The receiving capability (which is the same publishing capability in this case) receives the ping message, handles it (like writing to a log file) and responds with a pong message. The publishing capability uses its own destination ID for the X-XC-DESTINATION-ID header value for the ping message and in the code that shows the receiving example, it retrieves the destination of the sender by using X-XC-PUBLISHER-PSEUDONYM header.
+The PingPong demo demonstrates the basic messaging mechanism the X.commerce Fabric uses. 
 
-You can find more details in the language specific folder.
+In this demo, a capability posts a Ping message to the Fabric on topic /com.x.ecosystemmanagement.v2/PingPong/Ping. The receiving capability receives the Ping message, 
+handles it (for example, writes to a log file) and responds (via the Fabric) with a Pong message on topic /com.x.ecosystemmanagement.v2/PingPong/Pong.
+
+The publishing capability puts the receiving capability's Capability ID in the X-XC-DESTINATION-ID header for the Ping message, so the Fabric delivers the Ping message
+to just this capability. So the Fabric sends the Pong message to the capability that originally sent the Ping message, the receiver sets the X-XC-DESTINATION-ID header 
+of the Pong message to the value of the X-XC-PUBLISHER-PSEUDONYM header in the Ping message.
+
+For more information, see the README file in the language-specific folder.
 
 

@@ -1,16 +1,18 @@
 About
 =====
 
-This is the PHP version of the simple ping pong example. The goal is to demonstrate a basic messaging flow using the Fabric.
+This is the PHP version of the PingPong demo. This program's goal is to demonstrate a basic message flow using the Fabric.
 
 
 Running this example
-====
+====================
 
-1. Copy the entire php folder into your apache webroot into some folder say, "example"
-2. Modify the .htaccess file to change the line 'RewriteBase /pingpong' to 'RewriteBase /example' or whatever name you choose.
-3. Make sure the log file test.log is writable (chmod 655). Do a tail -f test.log in a new terminal window to keep the log file open. 
-4. In your browser (assuming that apache is running), type "http://localhost/example/publish" in the address bar.
-5. This action is mapped to the script 'send_ping.php', which parses the ping message schema from the ocl cloud https://api.x.com/ocl/message/ping and publishes a message on a topic called /message/ping. Please note that you have to register your capability, get your authorization tokens and change the fabric url to the appropriate sandbox address before running this action.
-6. You will see two messages in the log file. The first will be a ping message sent my the fabric. This action is mapped to 'handle_ping.php' script. This responds with a pong action, which publishes to the logfile again.
+1. Copy the entire php folder into your Apache webroot, to some folder, such as "example"
+2. In the .htaccess file, change the line 'RewriteBase /web/pingpong' to 'RewriteBase /example' or whatever name you choose.
+3. Make sure the log file ping_pong.log is writable (chmod 655). Do a tail -f ping_pong.log in a new terminal window to keep the log file open. 
+4. In your browser (assuming that Apache is running), type "http://localhost/example/publish" in the address bar.
+5. This action is mapped to the script 'send_ping.php', which retrieves the Ping message schema from the OCL server, uses it to Avro-encode the Ping message 
+   and publishes this message on a topic /com.x.ecosystemmanagement.v2/PingPong/Ping. Please note that you must register a sending capability (named, for example, Pinger) 
+   and a receiving capability (named, for example, Ponger) to generate your authorization credentials. You must then add these credentials to the file common.php.
+6. After running the demo, open the log file. It shows you what happens as the Ping message is received by Ponger and as the Pong response message is received by Ponger.
 
