@@ -39,11 +39,6 @@ fwrite($fp, "\n\nhandle_message_failed.php:\nReceived a message on topic " . $to
 fwrite($fp,"\n\n/message/failed Headers\n------------------------------------\n");
 fwrite($fp, print_r($headers_msg_failed, true));
     
-// Deserialize the data in the error message's body
-$schema_uri = $headers_msg_failed['X-XC-SCHEMA-URI'];
-$msg_body_encoded = file_get_contents("php://input");
-$error_msg = avro_decode($schema_uri, $msg_body_encoded);
-
 // Get the message body from the HTTP message and deserialize it.
 $msg_body  = file_get_contents("php://input");
 $error_msg = avro_decode($headers_msg_failed['X-XC-SCHEMA-URI']   // URI of MessageFailed message's schema on the OCL server
